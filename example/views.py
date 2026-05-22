@@ -11,7 +11,7 @@ from .serializers import BookSerializer
 def HelloAPI(request):
     return Response("hello world")
 
-@api_view(['GET','POST'])
+@api_view(['GET', 'POST'])
 def booksAPI(request):
     if request.method == 'GET':
         books = Book.objects.all()
@@ -30,17 +30,17 @@ def bookAPI(request, bid):
     serializer = BookSerializer(book)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class BooksAPI(APIView):
     def get(self, request):
         books = Book.objects.all()
         serializer = BookSerializer(books, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
+        return Response(serializer.data, status=status.HTTP_200_OK) 
     def post(self, request):
         serializer = BookSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED) 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class BookAPI(APIView):
@@ -49,7 +49,7 @@ class BookAPI(APIView):
         serializer = BookSerializer(book)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class BooksAPIMixins(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+class BooksAPIMixins(mixins.ListModelMixin, mixins.CreateModelMixin,generics.GenericAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
@@ -58,7 +58,9 @@ class BooksAPIMixins(mixins.ListModelMixin, mixins.CreateModelMixin, generics.Ge
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
-class BookAPIMixins(mixins.RetrieveModelMixin, generics.GenericAPIView):
+class BookAPIMixins(mixins.RetrieveModelMixin,
+ mixins.UpdateModelMixin, mixins.DestroyModelMixin,
+  generics.GenericAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     lookup_field = 'bid'
@@ -69,4 +71,3 @@ class BookAPIMixins(mixins.RetrieveModelMixin, generics.GenericAPIView):
         return self.update(request, *args, **kwargs)
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
-
